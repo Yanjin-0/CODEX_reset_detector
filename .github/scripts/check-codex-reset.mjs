@@ -74,7 +74,18 @@ async function sendLineBroadcast(message) {
   }
 }
 
-const status = await fetchStatus();
+let status;
+try {
+  status = await fetchStatus();
+} catch (error) {
+  console.error(`Unable to read Codex reset status: ${error.message}`);
+  process.exitCode = 1;
+}
+
+if (!status) {
+  process.exit(1);
+}
+
 const previousState = readState();
 const currentState = String(status.state || "");
 const currentResetAt = status.resetAt == null ? null : String(status.resetAt);
